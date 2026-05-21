@@ -1,0 +1,90 @@
+# ─────────────────────────────────────────────────────────────────────────
+# Deploy the TransLog prototype (App/) to GitHub Pages.
+#
+# What this does:
+#   1. On every push to `main` that touches App/ or this workflow,
+#      copy App/ contents into a staging dir.
+#   2. Rename `index(1).html` → `index.html` so GitHub Pages serves the
+#      app at the site root (the source file is intentionally untouched).
+#   3. Drop the obsolete `App/deploy.yml` from the staging dir.
+#   4. Publish the staging dir to GitHub Pages.
+#
+# Repo prerequisites (one-time, in repo Settings):
+#   Settings → Pages → Source: "GitHub Actions"
+#
+# Trigger manually any time from:
+#   Actions → "Deploy TransLog to GitHub Pages" → "Run workflow"
+# ─────────────────────────────────────────────────────────────────────────
+
+name: Deploy TransLog to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'App/**'
+      - '.github/workflows/deploy-translog.yml'
+  workflow_dispatch:
+
+# GITHUB_TOKEN scopes needed by actions/deploy-pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time. New runs cancel in-progress ones.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Stage App/ for Pages
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+
+          # Copy the TransLog prototype contents — and nothing else from the repo.
+          cp -r App/. _site/
+
+          # GitHub Pages serves /index.html at the site root.
+          # The source file is named `index(1).html` (downloaded with a "Save As" suffix).
+          # If a proper index.html doesn't exist yet, rename it during the build.
+          if [ -f "_site/index(1).html" ] && [ ! -f "_site/index.html" ]; then
+            mv "_site/index(1).html" "_site/index.html"
+          fi
+
+          # The legacy workflow file shipped inside App/ shouldn't be served publicly.
+          rm -f "_site/deploy.yml"
+
+          # Disable Jekyll processing — we want the files served verbatim.
+          touch "_site/.nojekyll"
+
+          echo "── Staged files ──"
+          ls -la _site
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

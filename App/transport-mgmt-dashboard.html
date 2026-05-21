@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TransLog — Sistema de Gestión de Transporte Corporativo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111418;
+    --surface2: #181c22;
+    --border: #1e242d;
+    --accent: #00d4aa;
+    --accent2: #ff6b35;
+    --accent3: #7c6eff;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --dim: #334155;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── LAYOUT ─── */
+  .app { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    transition: transform .3s;
+  }
+
+  .main { margin-left: 220px; flex: 1; padding: 24px; min-height: 100vh; }
+
+  /* ─── SIDEBAR ─── */
+  .logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-mark {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-mark span { color: var(--text); }
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .role-badge {
+    margin: 12px 16px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .role-badge.coordinator { background: rgba(124,110,255,.15); color: var(--accent3); border: 1px solid rgba(124,110,255,.3); }
+  .role-badge.provider { background: rgba(0,212,170,.1); color: var(--accent); border: 1px solid rgba(0,212,170,.25); }
+
+  nav { flex: 1; padding: 8px 0; overflow-y: auto; }
+
+  .nav-section { padding: 12px 16px 6px; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all .15s;
+    font-weight: 400;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,170,.06); font-weight: 500; }
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 9px; font-family: 'JetBrains Mono', monospace; padding: 2px 6px; border-radius: 10px; }
+
+  .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); }
+  .user-chip { display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,var(--accent3),var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+  .user-info .name { font-size: 12px; font-weight: 500; }
+  .user-info .role { font-size: 10px; color: var(--muted); }
+
+  /* ─── HEADER ─── */
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+  }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
+  .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; font-family: 'Inter', sans-serif;
+    display: inline-flex; align-items: center; gap: 7px; transition: all .15s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: #0a0c10; }
+  .btn-primary:hover { background: #00efc0; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--dim); }
+  .btn-warn { background: rgba(245,158,11,.15); color: var(--warn); border: 1px solid rgba(245,158,11,.3); }
+  .btn-sm { padding: 5px 11px; font-size: 11px; }
+
+  /* ─── PERIOD TABS ─── */
+  .period-tabs { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+  .period-tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--muted); transition: all .15s; }
+  .period-tab.active { background: var(--surface2); color: var(--text); }
+
+  /* ─── KPI GRID ─── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .kpi-card:hover { border-color: var(--dim); }
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    border-radius: 0 12px 0 60px;
+    opacity: .08;
+  }
+  .kpi-card.green::after { background: var(--accent); }
+  .kpi-card.orange::after { background: var(--accent2); }
+  .kpi-card.purple::after { background: var(--accent3); }
+  .kpi-card.yellow::after { background: var(--warn); }
+
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; font-family: 'JetBrains Mono', monospace; }
+  .kpi-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -1px; }
+  .kpi-card.green .kpi-value { color: var(--accent); }
+  .kpi-card.orange .kpi-value { color: var(--accent2); }
+  .kpi-card.purple .kpi-value { color: var(--accent3); }
+  .kpi-card.yellow .kpi-value { color: var(--warn); }
+
+  .kpi-delta { font-size: 11px; display: flex; align-items: center; gap: 4px; }
+  .kpi-delta.up { color: var(--accent); }
+  .kpi-delta.down { color: var(--danger); }
+  .kpi-delta.neutral { color: var(--muted); }
+
+  /* ─── CONTENT GRID ─── */
+  .content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 16px; margin-bottom: 16px; }
+  .content-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; }
+  .card-body { padding: 20px; }
+  .card-body-flush { padding: 0; }
+
+  /* ─── CHART BAR ─── */
+  .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding: 0 4px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    transition: opacity .2s;
+    position: relative;
+    cursor: pointer;
+  }
+  .bar:hover { opacity: .8; }
+  .bar-label { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .bar-val { font-size: 10px; color: var(--text); font-weight: 500; }
+
+  /* ─── ROUTE TABLE ─── */
+  .route-table { width: 100%; border-collapse: collapse; }
+  .route-table th {
+    text-align: left; padding: 10px 20px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); font-family: 'JetBrains Mono', monospace;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  .route-table td { padding: 12px 20px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .route-table tr:last-child td { border-bottom: none; }
+  .route-table tr:hover td { background: var(--surface2); }
+
+  .rank-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); width: 28px; }
+  .route-name { font-weight: 500; font-size: 13px; }
+  .route-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .cost-val { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; }
+  .eff-bar-wrap { width: 80px; background: var(--surface2); border-radius: 4px; height: 5px; overflow: hidden; }
+  .eff-bar { height: 100%; border-radius: 4px; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 10px; font-family: 'JetBrains Mono', monospace;
+  }
+  .tag-green { background: rgba(0,212,170,.12); color: var(--accent); }
+  .tag-red { background: rgba(239,68,68,.12); color: var(--danger); }
+  .tag-yellow { background: rgba(245,158,11,.12); color: var(--warn); }
+  .tag-purple { background: rgba(124,110,255,.12); color: var(--accent3); }
+
+  /* ─── ALERT PANEL ─── */
+  .alert-list { display: flex; flex-direction: column; }
+  .alert-item {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 12px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .alert-item:last-child { border-bottom: none; }
+  .alert-item:hover { background: var(--surface2); }
+  .alert-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .alert-icon.warn { background: rgba(245,158,11,.15); }
+  .alert-icon.danger { background: rgba(239,68,68,.12); }
+  .alert-icon.info { background: rgba(124,110,255,.12); }
+  .alert-text .title { font-size: 12px; font-weight: 500; }
+  .alert-text .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .alert-time { margin-left: auto; font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; white-space: nowrap; padding-top: 2px; }
+
+  /* ─── BRANCH COMPARE ─── */
+  .branch-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .branch-row:last-child { border-bottom: none; }
+  .branch-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .branch-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .branch-meta { font-size: 11px; color: var(--muted); }
+  .branch-bar-wrap { width: 100px; background: var(--surface2); height: 6px; border-radius: 3px; overflow: hidden; }
+  .branch-bar { height: 100%; border-radius: 3px; }
+  .branch-cost { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; min-width: 70px; text-align: right; }
+
+  /* ─── OCCUPANCY RING ─── */
+  .ring-stat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .ring-wrap { position: relative; width: 100px; height: 100px; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-pct { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; }
+  .ring-lbl { font-size: 10px; color: var(--muted); }
+
+  /* ─── MINI TRIP LIST ─── */
+  .trip-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .trip-item:last-child { border-bottom: none; }
+  .trip-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); width: 44px; }
+  .trip-info { flex: 1; }
+  .trip-route { font-size: 12px; font-weight: 500; }
+  .trip-detail { font-size: 11px; color: var(--muted); }
+  .trip-cost { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--accent); }
+
+  /* ─── EMPLOYEE RANKING ─── */
+  .emp-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .emp-row:last-child { border-bottom: none; }
+  .emp-rank { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); width: 18px; }
+  .emp-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #0a0c10; flex-shrink: 0; }
+  .emp-name { font-size: 12px; font-weight: 500; flex: 1; }
+  .emp-route { font-size: 10px; color: var(--muted); }
+  .emp-cost { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--warn); }
+
+  /* ─── TABS ─── */
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); }
+  .tab { padding: 10px 16px; font-size: 12px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; padding: 20px; }
+  .tab-content.active { display: block; }
+
+  /* ─── OCR / QR PANELS ─── */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .upload-zone:hover { border-color: var(--accent); background: rgba(0,212,170,.04); }
+  .upload-icon { font-size: 36px; margin-bottom: 10px; }
+  .upload-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .upload-sub { font-size: 12px; color: var(--muted); }
+
+  .ocr-result {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 14px;
+  }
+  .ocr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .ocr-title { font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+
+  .ocr-entry { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid var(--border); }
+  .ocr-entry:last-child { border-bottom: none; }
+  .ocr-check { color: var(--accent); }
+  .ocr-warn-icon { color: var(--warn); }
+  .ocr-name { flex: 1; }
+  .ocr-sig { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── QR DISPLAY ─── */
+  .qr-box {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 20px;
+    background: var(--surface2); border-radius: 10px; border: 1px solid var(--border);
+  }
+  .qr-visual {
+    width: 100px; height: 100px;
+    background: white; border-radius: 8px;
+    display: grid; grid-template-columns: repeat(7,1fr); gap: 1px;
+    padding: 8px;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .qr-px { border-radius: 1px; }
+  .qr-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 1px; }
+
+  /* ─── ARCH DOC SECTION ─── */
+  .arch-section { margin-bottom: 32px; }
+  .section-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-heading .num {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(0,212,170,.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+
+  .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .tech-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+  }
+  .tech-layer { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+  .tech-stack-item { font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .tech-stack-item:last-child { border-bottom: none; }
+  .tech-name { font-weight: 500; }
+  .tech-why { font-size: 10px; color: var(--muted); }
+
+  .db-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .db-table-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden;
+  }
+  .db-table-name {
+    background: rgba(0,212,170,.1); padding: 8px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--accent); font-weight: 500;
+    border-bottom: 1px solid var(--border);
+  }
+  .db-field { padding: 5px 12px; font-size: 11px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(30,36,45,.6); }
+  .db-field:last-child { border-bottom: none; }
+  .db-field-name { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  .db-field-type { font-family: 'JetBrains Mono', monospace; color: var(--accent3); font-size: 10px; }
+  .db-pk { color: var(--warn); font-size: 9px; margin-left: 4px; }
+  .db-fk { color: var(--accent2); font-size: 9px; margin-left: 4px; }
+
+  .endpoint-list { display: flex; flex-direction: column; gap: 6px; }
+  .endpoint-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 12px; font-size: 12px;
+  }
+  .method { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 600; min-width: 52px; text-align: center; }
+  .method.get { background: rgba(0,212,170,.15); color: var(--accent); }
+  .method.post { background: rgba(124,110,255,.15); color: var(--accent3); }
+  .method.put { background: rgba(245,158,11,.15); color: var(--warn); }
+  .method.delete { background: rgba(239,68,68,.12); color: var(--danger); }
+  .endpoint-path { font-family: 'JetBrains Mono', monospace; color: var(--text); flex: 1; }
+  .endpoint-desc { color: var(--muted); font-size: 11px; }
+
+  .flow-steps { display: flex; flex-direction: column; gap: 0; }
+  .flow-step { display: flex; gap: 14px; }
+  .flow-line { display: flex; flex-direction: column; align-items: center; }
+  .flow-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .flow-connector { flex: 1; width: 2px; background: var(--border); margin: 3px 0; min-height: 20px; }
+  .flow-content { padding: 0 0 20px 0; flex: 1; }
+  .flow-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .flow-desc { font-size: 12px; color: var(--muted); }
+  .flow-step:last-child .flow-connector { display: none; }
+
+  .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .bonus-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+    border-left: 3px solid;
+  }
+  .bonus-card:nth-child(1) { border-left-color: var(--accent); }
+  .bonus-card:nth-child(2) { border-left-color: var(--accent3); }
+  .bonus-card:nth-child(3) { border-left-color: var(--accent2); }
+  .bonus-card:nth-child(4) { border-left-color: var(--warn); }
+  .bonus-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .bonus-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent3); background: var(--surface2); padding: 2px 6px; border-radius: 4px; }
+
+  /* ─── PAGE VISIBILITY ─── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1100px) {
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+    .content-grid-3 { grid-template-columns: 1fr 1fr; }
+    .db-grid { grid-template-columns: repeat(2,1fr); }
+    .tech-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-220px); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; padding: 16px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .content-grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* ─── ANIM ─── */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .page.active { animation: fadeIn .25s ease; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">🚌 Trans<span>Log</span></div>
+    <div class="logo-sub">v1.0 · Corporate Transport</div>
+  </div>
+
+  <div class="role-badge coordinator" id="roleBadge">● Coordinador Regional</div>
+
+  <nav>
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('trips')"><span class="icon">🗺️</span> Viajes <span class="nav-badge">3</span></div>
+    <div class="nav-item" onclick="showPage('routes')"><span class="icon">🛣️</span> Rutas</div>
+    <div class="nav-item" onclick="showPage('checkin')"><span class="icon">📷</span> Check-in OCR/QR</div>
+
+    <div class="nav-section">Gestión</div>
+    <div class="nav-item" onclick="showPage('employees')"><span class="icon">👥</span> Empleados</div>
+    <div class="nav-item" onclick="showPage('vehicles')"><span class="icon">🚐</span> Vehículos</div>
+    <div class="nav-item" onclick="showPage('costs')"><span class="icon">💰</span> Costos</div>
+
+    <div class="nav-section">Análisis</div>
+    <div class="nav-item" onclick="showPage('reports')"><span class="icon">📋</span> Reportes</div>
+    <div class="nav-item" onclick="showPage('architecture')"><span class="icon">🏗️</span> Arquitectura</div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">CR</div>
+      <div class="user-info">
+        <div class="name">Carlos Rivera</div>
+        <div class="role">Coordinador · Sucursal A</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: DASHBOARD
+═══════════════════════════════════════════════════ -->
+<main class="main">
+<div class="page active" id="page-dashboard">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard Operativo</div>
+      <div class="page-subtitle">Junio 2025 · 3 sucursales · Actualizado hace 4 min</div>
+    </div>
+    <div class="header-actions">
+      <div class="period-tabs">
+        <div class="period-tab">7D</div>
+        <div class="period-tab active">MES</div>
+        <div class="period-tab">TRIM</div>
+        <div class="period-tab">AÑO</div>
+      </div>
+      <button class="btn btn-primary">⬇ Exportar</button>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card green">
+      <div class="kpi-label">Gasto Total Mensual</div>
+      <div class="kpi-value">$48,320</div>
+      <div class="kpi-delta up">↑ 3.2% vs mes anterior</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">Viajes Realizados</div>
+      <div class="kpi-value">312</div>
+      <div class="kpi-delta up">↑ 12 viajes más</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Empleados Transportados</div>
+      <div class="kpi-value">4,186</div>
+      <div class="kpi-delta neutral">≈ ocupación 89%</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Costo por Persona</div>
+      <div class="kpi-value">$11.54</div>
+      <div class="kpi-delta down">↓ $0.32 vs objetivo</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="content-grid">
+    <!-- Gasto por ruta (bar chart) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Gasto Mensual por Ruta</div>
+        <span class="tag tag-green">6 rutas activas</span>
+      </div>
+      <div class="card-body">
+        <div class="chart-bars">
+          <div class="bar-col">
+            <div class="bar-wrap"><div class="bar" style="height:82%;background:linear-gradient(180deg,#00d4aa,#009977);" title="$12,400"></div></div>
+            <div class="bar-label">R-01</div><div class="bar-val">$12.4k</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-wrap"><div class="bar" style="height:65%;background:linear-gradient(180deg,#7c6eff,#5548cc);" title="$9,800"></div></div>
+            <div class="bar-label">R-02</div><div class="bar-val">$9.8k</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-wrap"><div class="bar" style="height:55%;background:linear-gradient(180deg,#ff6b35,#cc4400);" title="$8,300"></div></div>
+            <div class="bar-label">R-03</div><div class="bar-val">$8.3k</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-wrap"><div class="bar" style="height:44%;background:linear-gradient(180deg,#f59e0b,#c47800);" title="$6,600"></div></div>
+            <div class="bar-label">R-04</div><div class="bar-val">$6.6k</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-wrap"><div class="bar" style="height:38%;background:linear-gradient(180deg,#00d4aa,#009977);opacity:.7" title="$5,700"></div></div>
+            <div class="bar-label">R-05</div><div class="bar-val">$5.7k</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-wrap"><div class="bar" style="height:36%;background:linear-gradient(180deg,#7c6eff,#5548cc);opacity:.7" title="$5,520"></div></div>
+            <div class="bar-label">R-06</div><div class="bar-val">$5.5k</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚠️ Alertas Activas</div>
+        <span class="tag tag-red">4 pendientes</span>
+      </div>
+      <div class="alert-list">
+        <div class="alert-item">
+          <div class="alert-icon danger">🔴</div>
+          <div class="alert-text">
+            <div class="title">Ruta R-01 sobre presupuesto</div>
+            <div class="sub">+18% vs objetivo mensual</div>
+          </div>
+          <div class="alert-time">14:22</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon warn">⚠️</div>
+          <div class="alert-text">
+            <div class="title">Vehículo PJD-4421 baja ocupación</div>
+            <div class="sub">Promedio 58% esta semana</div>
+          </div>
+          <div class="alert-time">09:10</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon info">🔵</div>
+          <div class="alert-text">
+            <div class="title">12 registros OCR sin validar</div>
+            <div class="sub">Importación del 18/06</div>
+          </div>
+          <div class="alert-time">ayer</div>
+        </div>
+        <div class="alert-item">
+          <div class="alert-icon warn">⚠️</div>
+          <div class="alert-text">
+            <div class="title">Sucursal B excede límite</div>
+            <div class="sub">Gasto: $19,200 / Límite: $18,000</div>
+          </div>
+          <div class="alert-time">lun</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Routes table + branch compare -->
+  <div class="content-grid">
+    <!-- Top rutas -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Ranking de Rutas por Costo</div>
+        <button class="btn btn-ghost btn-sm">Ver todas</button>
+      </div>
+      <div class="card-body-flush">
+        <table class="route-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Ruta</th>
+              <th>Costo Mes</th>
+              <th>$/persona</th>
+              <th>Eficiencia</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="rank-num">01</span></td>
+              <td><div class="route-name">Norte — Zona Industria</div><div class="route-meta">Bus 48p · PJD-1190 · 22 viajes</div></td>
+              <td><span class="cost-val" style="color:var(--accent)">$12,400</span></td>
+              <td>$8.60</td>
+              <td><div class="eff-bar-wrap"><div class="eff-bar" style="width:91%;background:var(--accent)"></div></div></td>
+              <td><span class="tag tag-green">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">02</span></td>
+              <td><div class="route-name">Sur — Residencial Beta</div><div class="route-meta">Van 18p · PJD-2244 · 22 viajes</div></td>
+              <td><span class="cost-val" style="color:var(--accent3)">$9,800</span></td>
+              <td>$14.20</td>
+              <td><div class="eff-bar-wrap"><div class="eff-bar" style="width:68%;background:var(--accent3)"></div></div></td>
+              <td><span class="tag tag-yellow">⚡ Rev.</span></td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">03</span></td>
+              <td><div class="route-name">Este — Urbanización Palma</div><div class="route-meta">Minibus 26p · PJD-3311 · 21 viajes</div></td>
+              <td><span class="cost-val" style="color:var(--accent2)">$8,300</span></td>
+              <td>$11.10</td>
+              <td><div class="eff-bar-wrap"><div class="eff-bar" style="width:78%;background:var(--accent2)"></div></div></td>
+              <td><span class="tag tag-green">✓ OK</span></td>
+            </tr>
+            <tr>
+              <td><span class="rank-num">04</span></td>
+              <td><div class="route-name">Oeste — Centro Histórico</div><div class="route-meta">Van 18p · PJD-4421 · 18 viajes</div></td>
+              <td><span class="cost-val" style="color:var(--warn)">$6,600</span></td>
+              <td>$18.90</td>
+              <td><div class="eff-bar-wrap"><div class="eff-bar" style="width:44%;background:var(--danger)"></div></div></td>
+              <td><span class="tag tag-red">⚠ Inef.</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Branch compare -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Gasto por Sucursal</div>
+      </div>
+      <div class="card-body">
+        <div class="branch-row">
+          <div class="branch-dot" style="background:var(--accent)"></div>
+          <div style="flex:1">
+            <div class="branch-name">Sucursal A — Norte</div>
+            <div class="branch-meta">4 rutas · 138 viajes</div>
+          </div>
+          <div style="text-align:right">
+            <div class="branch-bar-wrap"><div class="branch-bar" style="width:88%;background:var(--accent)"></div></div>
+          </div>
+          <div class="branch-cost" style="color:var(--accent)">$21,200</div>
+        </div>
+        <div class="branch-row">
+          <div class="branch-dot" style="background:var(--accent2)"></div>
+          <div style="flex:1">
+            <div class="branch-name">Sucursal B — Sur</div>
+            <div class="branch-meta">3 rutas · 102 viajes</div>
+          </div>
+          <div style="text-align:right">
+            <div class="branch-bar-wrap"><div class="branch-bar" style="width:73%;background:var(--accent2)"></div></div>
+          </div>
+          <div class="branch-cost" style="color:var(--accent2)">$19,200</div>
+        </div>
+        <div class="branch-row">
+          <div class="branch-dot" style="background:var(--accent3)"></div>
+          <div style="flex:1">
+            <div class="branch-name">Sucursal C — Este</div>
+            <div class="branch-meta">2 rutas · 72 viajes</div>
+          </div>
+          <div style="text-align:right">
+            <div class="branch-bar-wrap"><div class="branch-bar" style="width:30%;background:var(--accent3)"></div></div>
+          </div>
+          <div class="branch-cost" style="color:var(--accent3)">$7,920</div>
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div class="card-title" style="margin-bottom:14px">Ocupación Promedio por Ruta</div>
+          <div style="display:flex;gap:16px;justify-content:space-around">
+            <div class="ring-stat">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--surface2)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent)" stroke-width="8" stroke-dasharray="214" stroke-dashoffset="19" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-center"><div class="ring-pct" style="color:var(--accent)">91%</div><div class="ring-lbl">R-01</div></div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--surface2)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--accent3)" stroke-width="8" stroke-dasharray="214" stroke-dashoffset="68" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-center"><div class="ring-pct" style="color:var(--accent3)">68%</div><div class="ring-lbl">R-02</div></div>
+              </div>
+            </div>
+            <div class="ring-stat">
+              <div class="ring-wrap">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--surface2)" stroke-width="8"/>
+                  <circle cx="50" cy="50" r="38" fill="none" stroke="var(--danger)" stroke-width="8" stroke-dasharray="214" stroke-dashoffset="119" stroke-linecap="round"/>
+                </svg>
+                <div class="ring-center"><div class="ring-pct" style="color:var(--danger)">44%</div><div class="ring-lbl">R-04</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee ranking + recent trips -->
+  <div class="content-grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Top Empleados por Costo</div>
+        <span class="tag tag-yellow">Jun 2025</span>
+      </div>
+      <div class="card-body">
+        <div class="emp-row"><div class="emp-rank">1</div><div class="emp-avatar" style="background:var(--accent)">MR</div><div style="flex:1"><div class="emp-name">María Rodríguez</div><div class="emp-route">R-02 · Sucursal B</div></div><div class="emp-cost">$182.40</div></div>
+        <div class="emp-row"><div class="emp-rank">2</div><div class="emp-avatar" style="background:var(--accent3)">JC</div><div style="flex:1"><div class="emp-name">Juan Castro</div><div class="emp-route">R-04 · Sucursal A</div></div><div class="emp-cost">$170.10</div></div>
+        <div class="emp-row"><div class="emp-rank">3</div><div class="emp-avatar" style="background:var(--accent2)">AL</div><div style="flex:1"><div class="emp-name">Ana López</div><div class="emp-route">R-02 · Sucursal B</div></div><div class="emp-cost">$165.80</div></div>
+        <div class="emp-row"><div class="emp-rank">4</div><div class="emp-avatar" style="background:var(--warn)">PM</div><div style="flex:1"><div class="emp-name">Pedro Martínez</div><div class="emp-route">R-04 · Sucursal C</div></div><div class="emp-cost">$162.00</div></div>
+        <div class="emp-row"><div class="emp-rank">5</div><div class="emp-avatar" style="background:var(--muted)">LS</div><div style="flex:1"><div class="emp-name">Laura Soto</div><div class="emp-route">R-01 · Sucursal A</div></div><div class="emp-cost">$98.60</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="grid-column:span 2">
+      <div class="card-header">
+        <div class="card-title">Viajes Recientes</div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('trips')">Ver todos →</button>
+      </div>
+      <div class="card-body">
+        <div class="trip-item"><div class="trip-time">18:45</div><div class="trip-info"><div class="trip-route">Norte — Zona Industria (R-01)</div><div class="trip-detail">PJD-1190 · 44/48 pasajeros · Chofer: Rafael D.</div></div><span class="tag tag-green">✓ Completo</span><div class="trip-cost">$564</div></div>
+        <div class="trip-item"><div class="trip-time">18:30</div><div class="trip-info"><div class="trip-route">Sur — Residencial Beta (R-02)</div><div class="trip-detail">PJD-2244 · 12/18 pasajeros · Chofer: Carlos M.</div></div><span class="tag tag-yellow">⚡ Bajo</span><div class="trip-cost">$420</div></div>
+        <div class="trip-item"><div class="trip-time">18:15</div><div class="trip-info"><div class="trip-route">Este — Urbanización Palma (R-03)</div><div class="trip-detail">PJD-3311 · 21/26 pasajeros · Chofer: Luis P.</div></div><span class="tag tag-green">✓ Completo</span><div class="trip-cost">$396</div></div>
+        <div class="trip-item"><div class="trip-time">17:50</div><div class="trip-info"><div class="trip-route">Oeste — Centro Histórico (R-04)</div><div class="trip-detail">PJD-4421 · 8/18 pasajeros · Chofer: Mario S.</div></div><span class="tag tag-red">⚠ Ineficiente</span><div class="trip-cost">$340</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: CHECK-IN OCR/QR
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-checkin">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Check-in Digital</div>
+      <div class="page-subtitle">OCR desde imagen de lista física · Formulario QR por ruta</div>
+    </div>
+    <button class="btn btn-primary">+ Nuevo Viaje</button>
+  </div>
+
+  <div class="content-grid">
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,'tab-ocr')">📷 Método A — OCR</div>
+        <div class="tab" onclick="switchTab(this,'tab-qr')">📱 Método B — QR</div>
+        <div class="tab" onclick="switchTab(this,'tab-batch')">📦 Batch Histórico</div>
+      </div>
+
+      <!-- OCR TAB -->
+      <div class="tab-content active" id="tab-ocr">
+        <div class="upload-zone" onclick="simulateOCR()">
+          <div class="upload-icon">📋</div>
+          <div class="upload-title">Arrastra o toca para subir foto del listado</div>
+          <div class="upload-sub">JPG, PNG · Máx. 10MB · El sistema detectará nombres y firmas automáticamente</div>
+        </div>
+
+        <div class="ocr-result" id="ocrResult" style="display:none">
+          <div class="ocr-header">
+            <div class="ocr-title"><div class="pulse"></div> OCR procesado · Ruta R-01 · 19/06/2025</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm">Editar</button>
+              <button class="btn btn-primary btn-sm">✓ Confirmar</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;font-size:12px">
+            <div>Vehículo: <code>PJD-1190</code></div>
+            <div>Chofer: <code>Rafael Domínguez</code></div>
+            <div>Fecha: <code>19/06/2025 18:45</code></div>
+            <div>Confianza OCR: <code style="color:var(--accent)">94.2%</code></div>
+          </div>
+          <div id="ocrEntries"></div>
+        </div>
+      </div>
+
+      <!-- QR TAB -->
+      <div class="tab-content" id="tab-qr">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Selecciona ruta para generar QR único:</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div onclick="selectRoute(this,'R-01')" style="padding:10px 14px;background:var(--surface2);border:1px solid var(--accent);border-radius:8px;cursor:pointer;font-size:13px">🛣️ R-01 · Norte Industria <span class="tag tag-green" style="float:right">activa</span></div>
+              <div onclick="selectRoute(this,'R-02')" style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px">🛣️ R-02 · Sur Beta <span class="tag tag-purple" style="float:right">activa</span></div>
+              <div onclick="selectRoute(this,'R-03')" style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px">🛣️ R-03 · Este Palma <span class="tag tag-purple" style="float:right">activa</span></div>
+            </div>
+          </div>
+          <div class="qr-box" id="qrBox">
+            <div style="font-size:12px;color:var(--muted)">← Selecciona una ruta</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:12px;font-weight:500;margin-bottom:8px">📲 Formulario que verá el empleado al escanear:</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.8">
+            → Nombre completo · → ID empleado (opcional) · → Confirmación de abordaje (checkbox) · → Timestamp automático · → Coordenadas GPS (opcional)
+          </div>
+        </div>
+      </div>
+
+      <!-- BATCH TAB -->
+      <div class="tab-content" id="tab-batch">
+        <div class="upload-zone">
+          <div class="upload-icon">📁</div>
+          <div class="upload-title">Subida masiva de imágenes históricas</div>
+          <div class="upload-sub">Selecciona múltiples archivos · Procesamiento en cola · Validación manual disponible</div>
+        </div>
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+          <div style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12px">
+            <span>📷</span><span style="flex:1">listado_01_may.jpg</span><span class="tag tag-green">✓ Procesado</span><span style="color:var(--muted)">44 empleados</span>
+          </div>
+          <div style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12px">
+            <span>📷</span><span style="flex:1">listado_02_may.jpg</span><div class="pulse" style="margin-left:auto"></div><span class="tag tag-yellow">Procesando…</span>
+          </div>
+          <div style="padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;gap:10px;font-size:12px">
+            <span>📷</span><span style="flex:1">listado_03_may.jpg</span><span class="tag tag-red">⚠ Rev. manual</span><span style="color:var(--muted)">3 nombres ilegibles</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live feed -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">Check-ins en tiempo real</div><div class="pulse"></div></div>
+      <div class="card-body">
+        <div id="liveFeed">
+          <div class="trip-item"><div class="trip-time" style="color:var(--accent)">18:51</div><div class="trip-info"><div class="trip-route">María González — R-01</div><div class="trip-detail">QR · PJD-1190</div></div><span class="tag tag-green">✓</span></div>
+          <div class="trip-item"><div class="trip-time" style="color:var(--accent)">18:50</div><div class="trip-info"><div class="trip-route">Carlos Peña — R-01</div><div class="trip-detail">QR · PJD-1190</div></div><span class="tag tag-green">✓</span></div>
+          <div class="trip-item"><div class="trip-time">18:49</div><div class="trip-info"><div class="trip-route">Luis Herrera — R-03</div><div class="trip-detail">QR · PJD-3311</div></div><span class="tag tag-green">✓</span></div>
+          <div class="trip-item"><div class="trip-time">18:47</div><div class="trip-info"><div class="trip-route">Ana Vargas — R-02</div><div class="trip-detail">QR · PJD-2244</div></div><span class="tag tag-green">✓</span></div>
+          <div class="trip-item"><div class="trip-time" style="color:var(--warn)">18:44</div><div class="trip-info"><div class="trip-route">Nombre ilegible — R-01</div><div class="trip-detail">OCR baja confianza (61%)</div></div><span class="tag tag-yellow">Rev</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PAGE: ARCHITECTURE
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-architecture">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Arquitectura del Sistema</div>
+      <div class="page-subtitle">Stack técnico, base de datos, flujos, endpoints y estrategia de escalado</div>
+    </div>
+  </div>
+
+  <!-- STACK -->
+  <div class="arch-section">
+    <div class="section-heading"><span class="num">1</span> Stack Tecnológico Recomendado</div>
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-layer">Frontend</div>
+        <div class="tech-stack-item"><span class="tech-name">Next.js 14 (App Router)</span><span class="tech-why">SSR + PWA + mobile-first</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Tailwind CSS</span><span class="tech-why">UI rápida y consistente</span></div>
+        <div class="tech-stack-item"><span class="tech-name">React Query</span><span class="tech-why">Cache + sync tiempo real</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Recharts / D3</span><span class="tech-why">Gráficas de KPIs</span></div>
+        <div class="tech-stack-item"><span class="tech-name">React Hook Form</span><span class="tech-why">Formularios QR</span></div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-layer">Backend</div>
+        <div class="tech-stack-item"><span class="tech-name">Next.js API Routes</span><span class="tech-why">REST API unificada</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Supabase (PostgreSQL)</span><span class="tech-why">DB + Auth + Realtime</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Supabase Storage</span><span class="tech-why">Imágenes OCR</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Prisma ORM</span><span class="tech-why">Type-safe queries</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Zod validation</span><span class="tech-why">Schemas API</span></div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-layer">OCR + Servicios</div>
+        <div class="tech-stack-item"><span class="tech-name">Google Vision API</span><span class="tech-why">OCR principal (texto + firmas)</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Tesseract.js (fallback)</span><span class="tech-why">Procesamiento local</span></div>
+        <div class="tech-stack-item"><span class="tech-name">QR Server API</span><span class="tech-why">Generación de QR codes</span></div>
+        <div class="tech-stack-item"><span class="tech-name">Vercel / Railway</span><span class="tech-why">Deploy edge + escalado</span></div>
+        <div class="tech-stack-item"><span class="tech-name">SheetJS (xlsx)</span><span class="tech-why">Exportación Excel</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DB SCHEMA -->
+  <div class="arch-section">
+    <div class="section-heading"><span class="num">2</span> Esquema de Base de Datos</div>
+    <div class="db-grid">
+      <div class="db-table-card">
+        <div class="db-table-name">branches</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">name</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">location</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">monthly_budget</span><span class="db-field-type">decimal</span></div>
+        <div class="db-field"><span class="db-field-name">created_at</span><span class="db-field-type">timestamp</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">employees</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">branch_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">full_name</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">employee_code</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">home_address</span><span class="db-field-type">text</span></div>
+        <div class="db-field"><span class="db-field-name">home_lat/lng</span><span class="db-field-type">float8</span></div>
+        <div class="db-field"><span class="db-field-name">active</span><span class="db-field-type">boolean</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">vehicles</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">plate</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">type</span><span class="db-field-type">enum</span></div>
+        <div class="db-field"><span class="db-field-name">capacity</span><span class="db-field-type">int</span></div>
+        <div class="db-field"><span class="db-field-name">driver_name</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">fuel_type</span><span class="db-field-type">enum</span></div>
+        <div class="db-field"><span class="db-field-name">cost_per_km</span><span class="db-field-type">decimal</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">routes</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">branch_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">vehicle_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">name / code</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">qr_token</span><span class="db-field-type">varchar unique</span></div>
+        <div class="db-field"><span class="db-field-name">base_cost</span><span class="db-field-type">decimal</span></div>
+        <div class="db-field"><span class="db-field-name">distance_km</span><span class="db-field-type">float</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">trips</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">route_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">vehicle_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">trip_date</span><span class="db-field-type">date</span></div>
+        <div class="db-field"><span class="db-field-name">departure_time</span><span class="db-field-type">time</span></div>
+        <div class="db-field"><span class="db-field-name">total_cost</span><span class="db-field-type">decimal</span></div>
+        <div class="db-field"><span class="db-field-name">passenger_count</span><span class="db-field-type">int</span></div>
+        <div class="db-field"><span class="db-field-name">source</span><span class="db-field-type">enum ocr/qr/manual</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">checkins</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">trip_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">employee_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">checkin_method</span><span class="db-field-type">enum</span></div>
+        <div class="db-field"><span class="db-field-name">checkin_time</span><span class="db-field-type">timestamp</span></div>
+        <div class="db-field"><span class="db-field-name">lat/lng</span><span class="db-field-type">float8</span></div>
+        <div class="db-field"><span class="db-field-name">ocr_confidence</span><span class="db-field-type">float</span></div>
+        <div class="db-field"><span class="db-field-name">validated</span><span class="db-field-type">boolean</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">costs</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">trip_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">cost_type</span><span class="db-field-type">enum</span></div>
+        <div class="db-field"><span class="db-field-name">amount</span><span class="db-field-type">decimal</span></div>
+        <div class="db-field"><span class="db-field-name">cost_per_person</span><span class="db-field-type">decimal computed</span></div>
+        <div class="db-field"><span class="db-field-name">fuel_liters</span><span class="db-field-type">float</span></div>
+        <div class="db-field"><span class="db-field-name">notes</span><span class="db-field-type">text</span></div>
+      </div>
+      <div class="db-table-card">
+        <div class="db-table-name">ocr_batches</div>
+        <div class="db-field"><span class="db-field-name">id<span class="db-pk">PK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">trip_id<span class="db-fk">FK</span></span><span class="db-field-type">uuid</span></div>
+        <div class="db-field"><span class="db-field-name">image_url</span><span class="db-field-type">varchar</span></div>
+        <div class="db-field"><span class="db-field-name">raw_ocr_json</span><span class="db-field-type">jsonb</span></div>
+        <div class="db-field"><span class="db-field-name">confidence_avg</span><span class="db-field-type">float</span></div>
+        <div class="db-field"><span class="db-field-name">status</span><span class="db-field-type">enum</span></div>
+        <div class="db-field"><span class="db-field-name">processed_at</span><span class="db-field-type">timestamp</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENDPOINTS -->
+  <div class="arch-section">
+    <div class="section-heading"><span class="num">3</span> Endpoints API Principales</div>
+    <div class="endpoint-list">
+      <div class="endpoint-item"><span class="method get">GET</span><span class="endpoint-path">/api/trips?branch=&route=&from=&to=</span><span class="endpoint-desc">Listado paginado de viajes con filtros</span></div>
+      <div class="endpoint-item"><span class="method post">POST</span><span class="endpoint-path">/api/trips</span><span class="endpoint-desc">Crear viaje + costos asociados</span></div>
+      <div class="endpoint-item"><span class="method post">POST</span><span class="endpoint-path">/api/checkin/qr</span><span class="endpoint-desc">Check-in por QR (empleado escanea)</span></div>
+      <div class="endpoint-item"><span class="method post">POST</span><span class="endpoint-path">/api/ocr/upload</span><span class="endpoint-desc">Subir imagen → retorna registros parseados</span></div>
+      <div class="endpoint-item"><span class="method post">POST</span><span class="endpoint-path">/api/ocr/confirm/:batchId</span><span class="endpoint-desc">Confirmar/editar resultado OCR</span></div>
+      <div class="endpoint-item"><span class="method get">GET</span><span class="endpoint-path">/api/analytics/dashboard?period=month&branch=</span><span class="endpoint-desc">KPIs agregados para dashboard</span></div>
+      <div class="endpoint-item"><span class="method get">GET</span><span class="endpoint-path">/api/reports/cost-per-person?month=&route=</span><span class="endpoint-desc">Reporte costo/persona por ruta</span></div>
+      <div class="endpoint-item"><span class="method get">GET</span><span class="endpoint-path">/api/reports/export?format=xlsx&filters=</span><span class="endpoint-desc">Exportar Excel con filtros</span></div>
+      <div class="endpoint-item"><span class="method get">GET</span><span class="endpoint-path">/api/routes/:id/qr</span><span class="endpoint-desc">Generar/obtener QR de ruta</span></div>
+      <div class="endpoint-item"><span class="method put">PUT</span><span class="endpoint-path">/api/routes/:id</span><span class="endpoint-desc">Editar ruta y asignar vehículo</span></div>
+    </div>
+  </div>
+
+  <!-- FLUJOS -->
+  <div class="arch-section">
+    <div class="section-heading"><span class="num">4</span> Flujos de Usuario</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--accent)">Flujo A · Carga OCR</div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--accent);color:#000">1</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Chofer toma foto del listado</div><div class="flow-desc">Desde app móvil · Cámara nativa</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--accent)">2</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Upload a Supabase Storage</div><div class="flow-desc">Imagen + metadata (ruta, vehículo, fecha)</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--accent3)">3</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Google Vision API procesa</div><div class="flow-desc">Extrae texto + detecta áreas de firma</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--accent3)">4</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Matching con empleados</div><div class="flow-desc">Fuzzy match nombres extraídos vs BD · confidence score</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--warn)">5</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Revisión manual si conf. &lt; 85%</div><div class="flow-desc">UI de validación con nombre sugerido + alternativas</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--accent2);color:#fff">6</div></div><div class="flow-content"><div class="flow-title">Registros guardados en BD</div><div class="flow-desc">Checkins + costos calculados automáticamente</div></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--accent3)">Flujo B · QR Check-in</div>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--accent3);color:#fff">1</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Empleado escanea QR de la ruta</div><div class="flow-desc">Código único por ruta · Con cámara del celular</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--accent3)">2</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Abre formulario web (PWA)</div><div class="flow-desc">Sin app instalada · Nombre + ID + confirmación</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--accent3)">3</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">POST /api/checkin/qr</div><div class="flow-desc">Timestamp + GPS opcionales guardados</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--surface2);border:2px solid var(--accent)">4</div><div class="flow-connector"></div></div><div class="flow-content"><div class="flow-title">Registro aparece en live feed</div><div class="flow-desc">Realtime via Supabase subscriptions</div></div></div>
+          <div class="flow-step"><div class="flow-line"><div class="flow-dot" style="background:var(--accent);color:#000">5</div></div><div class="flow-content"><div class="flow-title">Costos calculados al cerrar viaje</div><div class="flow-desc">total_cost / passenger_count · Por ruta y empleado</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BONUS -->
+  <div class="arch-section">
+    <div class="section-heading"><span class="num">5</span> Mejoras Estratégicas (Bonus)</div>
+    <div class="bonus-grid">
+      <div class="bonus-card">
+        <div class="bonus-title">📍 Geolocalización de Rutas</div>
+        <div class="bonus-desc">Integrar Google Maps Directions API para trazar rutas reales, medir km exactos y calcular costos de combustible automáticamente. El QR check-in captura GPS del empleado para validar que estaba en el punto de abordaje correcto (radio de 200m).</div>
+      </div>
+      <div class="bonus-card">
+        <div class="bonus-title">🔀 Optimización de Rutas (IA)</div>
+        <div class="bonus-desc">Con los domicilios de empleados + direcciones de sucursales, usar Google OR-Tools o OSRM para sugerir agrupamiento óptimo de empleados por zona geográfica. Potencial ahorro de 15-30% en costo por redistribución de rutas ineficientes como R-04.</div>
+      </div>
+      <div class="bonus-card">
+        <div class="bonus-title">⛽ Costos Reales de Combustible</div>
+        <div class="bonus-desc">Webhook a API de precios de combustible local (ej. DGII en RD). Cada vehículo tiene registrado <code>fuel_type</code> y <code>cost_per_km</code>. El sistema actualiza automáticamente el costo base por ruta cuando varía el precio del combustible.</div>
+      </div>
+      <div class="bonus-card">
+        <div class="bonus-title">🚨 Detección de Fraude / Anomalías</div>
+        <div class="bonus-desc">Alertas automáticas por: check-ins QR desde ubicación diferente al punto de ruta, mismo empleado en 2 rutas simultáneas, costo por viaje fuera de ±2σ histórico, variación brusca en ocupación sin justificación, o firma OCR presente pero GPS ausente.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--accent)">🚀 Estrategia de Escalado</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:12px;color:var(--muted);line-height:1.7">
+        <div><strong style="color:var(--text);display:block;margin-bottom:4px">Fase 1 — MVP (1-2 meses)</strong>Next.js + Supabase. QR check-in. OCR manual revisado. Dashboard básico. 1 proveedor, 3 sucursales.</div>
+        <div><strong style="color:var(--text);display:block;margin-bottom:4px">Fase 2 — Escala (3-6 meses)</strong>Múltiples proveedores. Batch OCR automático. Reportes avanzados. API pública para integración ERP cliente.</div>
+        <div><strong style="color:var(--text);display:block;margin-bottom:4px">Fase 3 — IA (6-12 meses)</strong>Optimización de rutas. Detección de fraude ML. Predicción de costos. App móvil nativa React Native.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     PLACEHOLDER PAGES
+═══════════════════════════════════════════════════ -->
+<div class="page" id="page-trips">
+  <div class="page-header"><div><div class="page-title">Gestión de Viajes</div><div class="page-subtitle">Crear, editar y consultar todos los viajes registrados</div></div><button class="btn btn-primary">+ Nuevo Viaje</button></div>
+  <div class="card"><div class="card-body" style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">🗺️</div><div style="font-size:14px">Módulo de viajes · 312 registros este mes</div><div style="font-size:12px;margin-top:6px">Filtros por fecha, ruta, sucursal y estado disponibles</div><button class="btn btn-ghost" style="margin-top:16px" onclick="showPage('dashboard')">← Volver al dashboard</button></div></div>
+</div>
+
+<div class="page" id="page-routes">
+  <div class="page-header"><div><div class="page-title">Rutas</div><div class="page-subtitle">Crear rutas, asignar vehículos y generar QR codes</div></div><button class="btn btn-primary">+ Nueva Ruta</button></div>
+  <div class="card"><div class="card-body" style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">🛣️</div><div style="font-size:14px">6 rutas activas · Gestión de QR y asignación de vehículos</div><button class="btn btn-ghost" style="margin-top:16px" onclick="showPage('checkin')">Ver Check-in QR →</button></div></div>
+</div>
+
+<div class="page" id="page-employees">
+  <div class="page-header"><div><div class="page-title">Empleados</div><div class="page-subtitle">Directorio de empleados transportados por sucursal</div></div><button class="btn btn-primary">+ Empleado</button></div>
+  <div class="card"><div class="card-body" style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">👥</div><div style="font-size:14px">286 empleados activos · 3 sucursales</div><button class="btn btn-ghost" style="margin-top:16px" onclick="showPage('dashboard')">← Dashboard</button></div></div>
+</div>
+
+<div class="page" id="page-vehicles">
+  <div class="page-header"><div><div class="page-title">Vehículos</div><div class="page-subtitle">Flota asignada al proveedor de transporte</div></div><button class="btn btn-primary">+ Vehículo</button></div>
+  <div class="card"><div class="card-body" style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">🚐</div><div style="font-size:14px">6 vehículos · Bus, Minibus, Van · Seguimiento de ocupación</div><button class="btn btn-ghost" style="margin-top:16px" onclick="showPage('dashboard')">← Dashboard</button></div></div>
+</div>
+
+<div class="page" id="page-costs">
+  <div class="page-header"><div><div class="page-title">Gestión de Costos</div><div class="page-subtitle">Registro manual de costos y ajustes por viaje</div></div></div>
+  <div class="card"><div class="card-body" style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">💰</div><div style="font-size:14px">Costos calculados automáticamente por viaje</div><button class="btn btn-ghost" style="margin-top:16px" onclick="showPage('dashboard')">← Dashboard</button></div></div>
+</div>
+
+<div class="page" id="page-reports">
+  <div class="page-header"><div><div class="page-title">Reportes</div><div class="page-subtitle">Exportación a Excel · Filtros por fecha, ruta y sucursal</div></div><button class="btn btn-primary">⬇ Exportar Excel</button></div>
+  <div class="card"><div class="card-body" style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">📋</div><div style="font-size:14px">Reportes: Costo/persona, Costo/ruta mensual, Comparativa sucursales</div><button class="btn btn-ghost" style="margin-top:16px" onclick="showPage('dashboard')">← Dashboard</button></div></div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ─── NAVIGATION ───
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+      n.classList.add('active');
+    }
+  });
+}
+
+// ─── TABS ───
+function switchTab(el, tabId) {
+  const card = el.closest('.card');
+  card.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  card.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  card.querySelector('#' + tabId).classList.add('active');
+}
+
+// ─── OCR SIMULATION ───
+const mockEmployees = [
+  { name: 'María González Díaz', sig: true, conf: 97 },
+  { name: 'Carlos Eduardo Peña', sig: true, conf: 95 },
+  { name: 'Luis Antonio Herrera', sig: true, conf: 91 },
+  { name: 'Ana Patricia Vargas', sig: false, conf: 88 },
+  { name: 'Rob??o Mart??ez', sig: false, conf: 61, warn: true },
+  { name: 'Sandra Lucía Torres', sig: true, conf: 93 },
+  { name: 'Miguel Ángel Castro', sig: true, conf: 96 },
+  { name: 'Paola Jiménez R.', sig: true, conf: 84 },
+];
+
+function simulateOCR() {
+  const result = document.getElementById('ocrResult');
+  const entries = document.getElementById('ocrEntries');
+  result.style.display = 'none';
+  entries.innerHTML = '<div style="text-align:center;padding:20px;font-size:12px;color:var(--muted)"><div class="pulse" style="margin:0 auto 8px"></div>Procesando imagen con Google Vision API…</div>';
+  result.style.display = 'block';
+  setTimeout(() => {
+    entries.innerHTML = mockEmployees.map(e => `
+      <div class="ocr-entry">
+        <span class="${e.warn ? 'ocr-warn-icon' : 'ocr-check'}">${e.warn ? '⚠' : '✓'}</span>
+        <span class="ocr-name" style="${e.warn ? 'color:var(--warn)' : ''}">${e.name}</span>
+        <span class="ocr-sig">${e.sig ? '✍ firma' : 'sin firma'}</span>
+        <span class="tag ${e.conf >= 85 ? 'tag-green' : 'tag-yellow'}" style="font-size:9px">${e.conf}%</span>
+      </div>`).join('');
+  }, 1800);
+}
+
+// ─── QR ───
+function selectRoute(el, routeCode) {
+  document.querySelectorAll('[onclick^="selectRoute"]').forEach(e => {
+    e.style.borderColor = 'var(--border)';
+  });
+  el.style.borderColor = 'var(--accent)';
+  const box = document.getElementById('qrBox');
+  const colors = { 'R-01': '#00d4aa', 'R-02': '#7c6eff', 'R-03': '#ff6b35' };
+  const c = colors[routeCode] || '#00d4aa';
+  const pattern = generateQRPattern();
+  box.innerHTML = `
+    <div style="font-size:11px;color:var(--muted)">Ruta ${routeCode}</div>
+    <div class="qr-visual" id="qrVis">${pattern}</div>
+    <div class="qr-label">TRANSLOG-${routeCode}-2025</div>
+    <button class="btn btn-primary btn-sm">⬇ Descargar QR</button>
+    <div style="font-size:10px;color:var(--muted);text-align:center">Válido hoy · Expira 23:59</div>
+  `;
+}
+
+function generateQRPattern() {
+  let html = '';
+  const corners = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,42,43,44,45,46];
+  for (let i = 0; i < 49; i++) {
+    const dark = corners.includes(i) || Math.random() > 0.55;
+    html += `<div class="qr-px" style="background:${dark ? '#000' : '#fff'}"></div>`;
+  }
+  return html;
+}
+</script>
+</body>
+</html>

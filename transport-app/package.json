@@ -1,0 +1,30 @@
+{
+  "name": "nexura-transport-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Nexura RD Transportation Management System — fleet, drivers, shipments, routes.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "lint": "echo \"(add eslint if desired)\" && exit 0",
+    "test": "echo \"(add tests with vitest or jest)\" && exit 0"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {}
+}

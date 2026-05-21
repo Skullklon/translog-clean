@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexura Transport — Admin Console</title>
+  <style>
+    :root{--bg:#0a0f1e;--card:#111729;--line:rgba(255,255,255,.08);--text:#f3f6fb;--muted:#b8c2d4;--brand:#00e0c6;--brand2:#4f7cff}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+    header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+    .brand{font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+    .brand b{background:linear-gradient(135deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .user{font-size:.9rem;color:var(--muted)}
+    .user button{margin-left:8px;background:transparent;border:1px solid var(--line);color:var(--text);padding:6px 10px;border-radius:8px;cursor:pointer}
+    main{flex:1;max-width:1100px;margin:0 auto;padding:32px 24px;width:100%}
+    .login{max-width:380px;margin:80px auto;padding:32px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+    .login h1{font-size:1.4rem;margin-bottom:6px}
+    .login p{color:var(--muted);margin-bottom:22px;font-size:.92rem}
+    label{display:block;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);font:inherit;font-size:.95rem}
+    input:focus,select:focus,textarea:focus{outline:0;border-color:var(--brand)}
+    button.primary{margin-top:18px;width:100%;padding:11px 16px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#04121b;font-weight:600;cursor:pointer;font-size:.95rem}
+    button.primary:hover{filter:brightness(1.08)}
+    .err{color:#ff6b6b;font-size:.88rem;margin-top:10px;min-height:1em}
+    nav.tabs{display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--line)}
+    nav.tabs button{background:none;border:0;color:var(--muted);padding:10px 14px;cursor:pointer;font:inherit;font-size:.92rem;border-bottom:2px solid transparent}
+    nav.tabs button.active{color:var(--text);border-bottom-color:var(--brand)}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+    th{color:var(--muted);font-weight:600;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+    .toolbar h2{font-size:1.15rem}
+    .btn-sm{padding:8px 14px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#04121b;font-weight:600;cursor:pointer;font-size:.85rem}
+    .empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+    .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:.72rem;background:rgba(0,224,198,.12);color:var(--brand)}
+    dialog{padding:0;border:0;border-radius:14px;background:var(--card);color:var(--text);max-width:480px;width:90%}
+    dialog::backdrop{background:rgba(0,0,0,.55)}
+    .dlg-inner{padding:24px}
+    .dlg-inner h3{margin-bottom:6px}
+    .dlg-inner .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+    .dlg-inner .row button{padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer;font:inherit;font-size:.9rem}
+    .dlg-inner .row button.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#04121b;border:0;font-weight:600}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Nexura<b>RD</b> · Transport Console</div>
+  <div class="user" id="userBox" hidden>
+    <span id="userName"></span>
+    <button onclick="logout()">Sign out</button>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<!-- Login view -->
+<template id="tpl-login">
+  <div class="login">
+    <h1>Sign in</h1>
+    <p>Use your administrator or dispatcher credentials.</p>
+    <form onsubmit="return doLogin(event)">
+      <label>Email</label>
+      <input type="email" name="email" required autocomplete="username"/>
+      <label>Password</label>
+      <input type="password" name="password" required autocomplete="current-password"/>
+      <button class="primary" type="submit">Sign in</button>
+      <div class="err" id="loginErr"></div>
+    </form>
+  </div>
+</template>
+
+<!-- Dashboard view -->
+<template id="tpl-dashboard">
+  <nav class="tabs">
+    <button data-tab="vehicles" class="active">Vehicles</button>
+    <button data-tab="drivers">Drivers</button>
+    <button data-tab="shipments">Shipments</button>
+  </nav>
+  <div id="tab"></div>
+</template>
+
+<script>
+  const API = ''; // same origin
+  const state = { token: localStorage.getItem('nx_token'), user: JSON.parse(localStorage.getItem('nx_user')||'null') };
+
+  async function api(path, opts={}) {
+    const headers = {'Content-Type':'application/json', ...(opts.headers||{})};
+    if (state.token) headers.Authorization = `Bearer ${state.token}`;
+    const res = await fetch(API + path, {...opts, headers});
+    if (res.status === 401) { logout(); throw new Error('Unauthorized'); }
+    const text = await res.text();
+    const body = text ? JSON.parse(text) : {};
+    if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
+    return body;
+  }
+
+  function render() {
+    const app = document.getElementById('app');
+    app.innerHTML = '';
+    if (!state.token) {
+      app.appendChild(document.importNode(document.getElementById('tpl-login').content, true));
+      document.getElementById('userBox').hidden = true;
+    } else {
+      app.appendChild(document.importNode(document.getElementById('tpl-dashboard').content, true));
+      document.getElementById('userBox').hidden = false;
+      document.getElementById('userName').textContent = state.user?.name + ' · ' + state.user?.role;
+      document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+        document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        loadTab(b.dataset.tab);
+      });
+      loadTab('vehicles');
+    }
+  }
+
+  async function doLogin(ev) {
+    ev.preventDefault();
+    const data = Object.fromEntries(new FormData(ev.target));
+    const err = document.getElementById('loginErr');
+    err.textContent = '';
+    try {
+      const out = await api('/api/auth/login', { method:'POST', body: JSON.stringify(data) });
+      state.token = out.token; state.user = out.user;
+      localStorage.setItem('nx_token', out.token);
+      localStorage.setItem('nx_user', JSON.stringify(out.user));
+      render();
+    } catch (e) { err.textContent = e.message; }
+    return false;
+  }
+
+  function logout() {
+    state.token = null; state.user = null;
+    localStorage.removeItem('nx_token'); localStorage.removeItem('nx_user');
+    render();
+  }
+
+  async function loadTab(tab) {
+    const host = document.getElementById('tab');
+    host.innerHTML = '<p style="color:var(--muted)">Loading…</p>';
+    try {
+      if (tab === 'vehicles') return renderVehicles(host);
+      if (tab === 'drivers')  return renderDrivers(host);
+      if (tab === 'shipments') return renderShipments(host);
+    } catch (e) { host.innerHTML = `<div class="empty">Failed: ${e.message}</div>`; }
+  }
+
+  async function renderVehicles(host) {
+    const { vehicles } = await api('/api/vehicles');
+    host.innerHTML = `
+      <div class="toolbar"><h2>Vehicles · ${vehicles.length}</h2>
+        <button class="btn-sm" onclick="newVehicle()">+ New vehicle</button></div>
+      ${vehicles.length ? `<table><thead><tr><th>Plate</th><th>Make / Model</th><th>Year</th><th>Status</th><th>Capacity</th></tr></thead><tbody>
+        ${vehicles.map(v => `<tr><td><b>${esc(v.plate)}</b></td><td>${esc(v.make)} ${esc(v.model)}</td><td>${v.year||'—'}</td><td><span class="badge">${esc(v.status)}</span></td><td>${v.capacity_kg ? v.capacity_kg+' kg' : '—'}</td></tr>`).join('')}
+      </tbody></table>` : `<div class="empty">No vehicles yet — add your first one.</div>`}
+    `;
+  }
+  async function renderDrivers(host) {
+    const { drivers } = await api('/api/drivers');
+    host.innerHTML = `
+      <div class="toolbar"><h2>Drivers · ${drivers.length}</h2>
+        <button class="btn-sm" onclick="newDriver()">+ New driver</button></div>
+      ${drivers.length ? `<table><thead><tr><th>Name</th><th>License</th><th>Phone</th><th>Status</th></tr></thead><tbody>
+        ${drivers.map(d => `<tr><td><b>${esc(d.full_name)}</b></td><td>${esc(d.license_number)}</td><td>${esc(d.phone||'—')}</td><td><span class="badge">${esc(d.status)}</span></td></tr>`).join('')}
+      </tbody></table>` : `<div class="empty">No drivers yet.</div>`}
+    `;
+  }
+  async function renderShipments(host) {
+    const { shipments } = await api('/api/shipments');
+    host.innerHTML = `
+      <div class="toolbar"><h2>Shipments · ${shipments.length}</h2>
+        <button class="btn-sm" onclick="newShipment()">+ New shipment</button></div>
+      ${shipments.length ? `<table><thead><tr><th>Ref</th><th>Route</th><th>Vehicle</th><th>Driver</th><th>Status</th></tr></thead><tbody>
+        ${shipments.map(s => `<tr><td><b>${esc(s.reference)}</b></td><td>${esc(s.origin)} → ${esc(s.destination)}</td><td>${esc(s.vehicle_plate||'—')}</td><td>${esc(s.driver_name||'—')}</td><td><span class="badge">${esc(s.status)}</span></td></tr>`).join('')}
+      </tbody></table>` : `<div class="empty">No shipments yet.</div>`}
+    `;
+  }
+
+  // Minimal create-modals — a real version would have edit/delete too.
+  function newVehicle()  { prompt2('New vehicle',  ['plate','make','model','year','capacity_kg'], '/api/vehicles'); }
+  function newDriver()   { prompt2('New driver',   ['full_name','license_number','phone','email'], '/api/drivers'); }
+  function newShipment() { prompt2('New shipment', ['reference','origin','destination'], '/api/shipments'); }
+
+  function prompt2(title, fields, url) {
+    const dlg = document.createElement('dialog');
+    dlg.innerHTML = `<div class="dlg-inner"><h3>${title}</h3>
+      <form id="f" style="margin-top:6px">${fields.map(f => `<label>${f}</label><input name="${f}"/>`).join('')}</form>
+      <div class="row"><button onclick="this.closest('dialog').close()">Cancel</button><button class="primary" onclick="submit2(this,'${url}')">Create</button></div></div>`;
+    document.body.appendChild(dlg); dlg.showModal();
+  }
+  async function submit2(btn, url) {
+    const dlg = btn.closest('dialog');
+    const data = Object.fromEntries(new FormData(dlg.querySelector('form')));
+    Object.keys(data).forEach(k => { if (data[k] === '') delete data[k]; });
+    try {
+      await api(url, { method:'POST', body: JSON.stringify(data) });
+      dlg.close(); dlg.remove();
+      loadTab(document.querySelector('.tabs button.active').dataset.tab);
+    } catch (e) { alert(e.message); }
+  }
+
+  function esc(s){return String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+  render();
+</script>
+
+</body>
+</html>

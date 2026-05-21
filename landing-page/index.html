@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nexura RD — Digital Services, Transportation & Automation</title>
+  <meta name="description" content="Nexura RD builds digital infrastructure for modern businesses: transportation management, automation, AI solutions, remote support, and technology consulting." />
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta property="og:title" content="Nexura RD — Digital Services" />
+  <meta property="og:description" content="Transportation, automation, AI, remote support and technology consulting." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://nexorard.org" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-0: #070b16;
+      --bg-1: #0a0f1e;
+      --bg-2: #111729;
+      --line: rgba(255,255,255,.08);
+      --text-0: #f3f6fb;
+      --text-1: #b8c2d4;
+      --text-2: #6f7a90;
+      --brand-0: #00e0c6;
+      --brand-1: #4f7cff;
+      --brand-grad: linear-gradient(135deg,#00e0c6 0%,#4f7cff 60%, #8b5cf6 100%);
+      --shadow-soft: 0 10px 40px -10px rgba(0,224,198,.25);
+      --radius: 16px;
+      --max: 1180px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+      background:var(--bg-1);
+      color:var(--text-0);
+      line-height:1.55;
+      overflow-x:hidden;
+      -webkit-font-smoothing:antialiased;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    h1,h2,h3,h4{font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+    h1{font-size:clamp(2.2rem,5vw,3.8rem)}
+    h2{font-size:clamp(1.75rem,3.4vw,2.6rem);margin-bottom:.75rem}
+    h3{font-size:1.2rem;margin-bottom:.5rem}
+    p{color:var(--text-1)}
+    section{padding:clamp(64px,9vw,120px) 24px;position:relative}
+    .container{max-width:var(--max);margin:0 auto}
+    .eyebrow{
+      display:inline-block;font-size:.78rem;font-weight:600;letter-spacing:.18em;
+      text-transform:uppercase;color:var(--brand-0);
+      padding:6px 14px;border:1px solid rgba(0,224,198,.3);border-radius:999px;
+      background:rgba(0,224,198,.05);margin-bottom:18px
+    }
+    .lead{font-size:clamp(1rem,1.4vw,1.15rem);color:var(--text-1);max-width:680px}
+
+    /* ----- Nav ----- */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:50;
+      backdrop-filter:saturate(140%) blur(14px);
+      background:rgba(10,15,30,.6);
+      border-bottom:1px solid transparent;
+      transition:background .25s ease,border-color .25s ease
+    }
+    .nav.scrolled{background:rgba(10,15,30,.85);border-bottom-color:var(--line)}
+    .nav-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 24px}
+    .brand{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem}
+    .brand-mark{
+      width:32px;height:32px;border-radius:9px;
+      background:var(--brand-grad);
+      display:grid;place-items:center;color:#000;font-weight:800
+    }
+    .nav-links{display:flex;gap:30px;align-items:center}
+    .nav-links a{color:var(--text-1);font-size:.92rem;font-weight:500;transition:color .15s}
+    .nav-links a:hover{color:var(--text-0)}
+    .nav-cta{
+      padding:10px 18px;border-radius:10px;
+      background:var(--brand-grad);
+      color:#04121b;font-weight:600;font-size:.9rem;
+      box-shadow:var(--shadow-soft);
+      transition:transform .15s
+    }
+    .nav-cta:hover{transform:translateY(-1px)}
+    .nav-toggle{display:none;background:none;border:0;color:var(--text-0);cursor:pointer;padding:8px}
+    @media (max-width: 820px){
+      .nav-links{
+        position:absolute;top:100%;left:0;right:0;background:var(--bg-1);
+        flex-direction:column;align-items:flex-start;gap:18px;
+        padding:24px;border-top:1px solid var(--line);
+        transform:translateY(-10px);opacity:0;pointer-events:none;transition:.2s
+      }
+      .nav-links.open{transform:translateY(0);opacity:1;pointer-events:auto}
+      .nav-toggle{display:block}
+    }
+
+    /* ----- Hero ----- */
+    .hero{
+      padding-top:140px;padding-bottom:80px;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(0,224,198,.18), transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(79,124,255,.18), transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(139,92,246,.12), transparent 50%),
+        var(--bg-1);
+      overflow:hidden;position:relative
+    }
+    .hero::before{
+      content:"";position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+      background-size:60px 60px;
+      mask-image:radial-gradient(circle at 50% 40%, #000 0%, transparent 70%);
+      pointer-events:none
+    }
+    .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center;position:relative;z-index:1}
+    .hero h1 span.grad{
+      background:var(--brand-grad);
+      -webkit-background-clip:text;background-clip:text;color:transparent
+    }
+    .hero-lead{margin:22px 0 32px;font-size:clamp(1.05rem,1.5vw,1.2rem);color:var(--text-1);max-width:560px}
+    .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:14px 22px;border-radius:12px;font-weight:600;font-size:.95rem;
+      transition:transform .15s, box-shadow .2s, border-color .15s;
+      cursor:pointer;border:0
+    }
+    .btn-primary{background:var(--brand-grad);color:#04121b;box-shadow:var(--shadow-soft)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 50px -10px rgba(0,224,198,.4)}
+    .btn-ghost{background:rgba(255,255,255,.04);color:var(--text-0);border:1px solid var(--line)}
+    .btn-ghost:hover{border-color:rgba(0,224,198,.4);background:rgba(0,224,198,.05)}
+
+    .hero-stats{display:flex;gap:28px;margin-top:42px;flex-wrap:wrap}
+    .stat{display:flex;flex-direction:column}
+    .stat strong{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--text-0)}
+    .stat span{font-size:.82rem;color:var(--text-2);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+
+    /* Hero visual */
+    .hero-visual{
+      position:relative;aspect-ratio:1;max-width:480px;justify-self:end;width:100%
+    }
+    .orbit{
+      position:absolute;inset:0;border:1px dashed rgba(255,255,255,.1);border-radius:50%;
+      animation:spin 40s linear infinite
+    }
+    .orbit:nth-child(2){inset:8%;animation-duration:55s;animation-direction:reverse}
+    .orbit:nth-child(3){inset:18%;animation-duration:30s}
+    .orbit-dot{
+      position:absolute;top:0;left:50%;transform:translate(-50%,-50%);
+      width:14px;height:14px;border-radius:50%;background:var(--brand-0);
+      box-shadow:0 0 18px var(--brand-0)
+    }
+    .orbit:nth-child(2) .orbit-dot{background:var(--brand-1);box-shadow:0 0 18px var(--brand-1)}
+    .orbit:nth-child(3) .orbit-dot{background:#8b5cf6;box-shadow:0 0 18px #8b5cf6}
+    .hero-core{
+      position:absolute;inset:30%;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, #00e0c6 0%, #4f7cff 50%, #8b5cf6 100%);
+      filter:blur(.5px);
+      box-shadow:0 0 80px rgba(0,224,198,.4), inset 0 0 60px rgba(255,255,255,.15);
+      animation:pulse 4s ease-in-out infinite
+    }
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+    @media (max-width: 820px){
+      .hero-grid{grid-template-columns:1fr;gap:40px}
+      .hero-visual{max-width:340px;margin:0 auto;justify-self:center}
+    }
+
+    /* ----- Sections ----- */
+    .section-head{text-align:center;max-width:720px;margin:0 auto 56px}
+    .section-head .eyebrow{margin-bottom:14px}
+    .section-head p{margin-top:14px}
+
+    /* About */
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    @media (max-width:820px){.about-grid{grid-template-columns:1fr}}
+    .about-points{display:grid;gap:18px;margin-top:24px}
+    .about-point{display:flex;gap:14px;align-items:flex-start}
+    .about-point svg{flex-shrink:0;width:22px;height:22px;color:var(--brand-0);margin-top:3px}
+    .about-card{
+      border:1px solid var(--line);border-radius:var(--radius);
+      background:linear-gradient(180deg,rgba(255,255,255,.025),transparent);
+      padding:36px;
+      display:grid;grid-template-columns:1fr 1fr;gap:24px
+    }
+    .about-card .mini{display:flex;flex-direction:column;gap:6px}
+    .about-card .mini strong{font-family:'Space Grotesk',sans-serif;font-size:1.8rem;background:var(--brand-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .about-card .mini span{color:var(--text-2);font-size:.85rem}
+
+    /* Services / cards */
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+    .card{
+      position:relative;
+      border:1px solid var(--line);border-radius:var(--radius);
+      padding:32px 26px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));
+      transition:transform .25s, border-color .25s, background .25s;
+      overflow:hidden
+    }
+    .card::before{
+      content:"";position:absolute;inset:0;border-radius:inherit;
+      background:radial-gradient(circle at var(--mx,30%) var(--my,20%), rgba(0,224,198,.12), transparent 50%);
+      opacity:0;transition:opacity .25s;pointer-events:none
+    }
+    .card:hover{transform:translateY(-4px);border-color:rgba(0,224,198,.35)}
+    .card:hover::before{opacity:1}
+    .card-icon{
+      width:46px;height:46px;border-radius:12px;
+      background:linear-gradient(135deg,rgba(0,224,198,.18),rgba(79,124,255,.12));
+      display:grid;place-items:center;color:var(--brand-0);margin-bottom:18px
+    }
+    .card-icon svg{width:24px;height:24px}
+    .card h3{font-size:1.15rem;color:var(--text-0)}
+    .card p{font-size:.93rem;color:var(--text-1);margin-top:8px}
+
+    /* Transportation feature stripe */
+    .feature{
+      display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+      padding:48px;border-radius:24px;border:1px solid var(--line);
+      background:linear-gradient(135deg,rgba(0,224,198,.04),rgba(79,124,255,.04));
+      position:relative;overflow:hidden
+    }
+    .feature::before{
+      content:"";position:absolute;width:380px;height:380px;border-radius:50%;
+      background:radial-gradient(circle,rgba(0,224,198,.15),transparent 70%);
+      right:-100px;top:-100px
+    }
+    .feature-list{display:grid;gap:14px;margin-top:22px}
+    .feature-list li{display:flex;gap:12px;align-items:flex-start;list-style:none}
+    .feature-list svg{flex-shrink:0;color:var(--brand-0);width:20px;height:20px;margin-top:3px}
+    .feature-visual{
+      position:relative;aspect-ratio:1.1;border-radius:18px;
+      background:
+        radial-gradient(circle at 20% 30%,rgba(0,224,198,.3),transparent 40%),
+        radial-gradient(circle at 80% 70%,rgba(79,124,255,.3),transparent 40%),
+        var(--bg-2);
+      border:1px solid var(--line);overflow:hidden;
+      display:grid;place-items:center
+    }
+    .map-svg{width:88%;height:88%;opacity:.95}
+    @media (max-width:820px){.feature{grid-template-columns:1fr;padding:32px}}
+
+    /* Contact */
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start}
+    @media (max-width:820px){.contact-grid{grid-template-columns:1fr}}
+    .contact-list{display:grid;gap:18px;margin-top:26px}
+    .contact-item{
+      display:flex;gap:14px;align-items:center;padding:18px 20px;
+      border:1px solid var(--line);border-radius:14px;
+      background:linear-gradient(180deg,rgba(255,255,255,.025),transparent);
+      transition:border-color .15s
+    }
+    .contact-item:hover{border-color:rgba(0,224,198,.35)}
+    .contact-item .icn{
+      width:42px;height:42px;border-radius:10px;flex-shrink:0;
+      background:rgba(0,224,198,.1);display:grid;place-items:center;color:var(--brand-0)
+    }
+    .contact-item .icn svg{width:22px;height:22px}
+    .contact-item small{color:var(--text-2);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase}
+    .contact-item span{color:var(--text-0);font-weight:500}
+
+    form{
+      border:1px solid var(--line);border-radius:18px;padding:32px;
+      background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);
+      display:grid;gap:14px
+    }
+    label{display:block;font-size:.8rem;color:var(--text-2);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+    input,textarea{
+      width:100%;padding:12px 14px;border-radius:10px;
+      background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text-0);
+      font:inherit;font-size:.95rem;transition:border-color .15s, background .15s;
+      resize:vertical
+    }
+    input:focus,textarea:focus{outline:0;border-color:rgba(0,224,198,.5);background:rgba(0,224,198,.05)}
+
+    /* WhatsApp floating */
+    .wa-fab{
+      position:fixed;bottom:24px;right:24px;z-index:60;
+      width:60px;height:60px;border-radius:50%;
+      background:#25d366;display:grid;place-items:center;color:#fff;
+      box-shadow:0 10px 30px rgba(37,211,102,.4);
+      animation:bob 3s ease-in-out infinite;transition:transform .2s
+    }
+    .wa-fab:hover{transform:scale(1.08)}
+    .wa-fab svg{width:30px;height:30px}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+    /* CTA strip */
+    .cta-strip{
+      margin:0 auto;max-width:var(--max);
+      padding:48px;border-radius:24px;
+      background:linear-gradient(135deg,#00e0c6 0%,#4f7cff 50%,#8b5cf6 100%);
+      color:#04121b;display:grid;grid-template-columns:1fr auto;gap:30px;align-items:center;
+      box-shadow:0 30px 80px -30px rgba(0,224,198,.5)
+    }
+    .cta-strip h2{color:#04121b;margin:0;font-size:clamp(1.4rem,2.5vw,2rem)}
+    .cta-strip p{color:rgba(4,18,27,.8);margin-top:6px}
+    .cta-strip .btn{background:#04121b;color:#fff}
+    .cta-strip .btn:hover{background:#000}
+    @media (max-width:820px){.cta-strip{grid-template-columns:1fr;text-align:center}}
+
+    /* Footer */
+    footer{padding:60px 24px 32px;border-top:1px solid var(--line);background:var(--bg-0)}
+    .footer-inner{max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:30px}
+    @media(max-width:820px){.footer-inner{grid-template-columns:1fr 1fr}}
+    @media(max-width:520px){.footer-inner{grid-template-columns:1fr}}
+    .footer-col h4{font-size:.85rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-2);margin-bottom:14px}
+    .footer-col a{display:block;color:var(--text-1);font-size:.92rem;margin-bottom:8px;transition:color .15s}
+    .footer-col a:hover{color:var(--brand-0)}
+    .footer-bottom{max-width:var(--max);margin:32px auto 0;padding-top:24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:.85rem;color:var(--text-2)}
+
+    /* Reveal animations */
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease}
+    .reveal.is-visible{opacity:1;transform:translateY(0)}
+    .reveal-delay-1{transition-delay:.08s}
+    .reveal-delay-2{transition-delay:.16s}
+    .reveal-delay-3{transition-delay:.24s}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand" aria-label="Nexura RD home">
+      <span class="brand-mark">N</span>
+      <span>Nexura<span style="color:var(--brand-0)">RD</span></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#services">Services</a>
+      <a href="#transport">Transportation</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a class="nav-cta" href="#contact">Get a Quote</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" width="24" height="24" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow reveal">Digital · Transportation · AI</span>
+        <h1 class="reveal reveal-delay-1">Modern technology<br/>for the businesses<br/><span class="grad">moving the world.</span></h1>
+        <p class="hero-lead reveal reveal-delay-2">Nexura RD designs and deploys the digital backbone for transportation companies, automation projects, and small-to-medium enterprises that want to scale without breaking what already works.</p>
+        <div class="hero-cta reveal reveal-delay-3">
+          <a href="#contact" class="btn btn-primary">
+            Start a project
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <a href="#services" class="btn btn-ghost">Explore services</a>
+        </div>
+        <div class="hero-stats reveal reveal-delay-3">
+          <div class="stat"><strong>24/7</strong><span>Remote support</span></div>
+          <div class="stat"><strong>30+</strong><span>Deployments delivered</span></div>
+          <div class="stat"><strong>99.9%</strong><span>Target uptime</span></div>
+        </div>
+      </div>
+      <div class="hero-visual reveal reveal-delay-2" aria-hidden="true">
+        <div class="orbit"><div class="orbit-dot"></div></div>
+        <div class="orbit"><div class="orbit-dot"></div></div>
+        <div class="orbit"><div class="orbit-dot"></div></div>
+        <div class="hero-core"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <span class="eyebrow">About Nexura RD</span>
+        <h2>We build digital infrastructure that businesses actually use.</h2>
+        <p class="lead">From transportation operators to small enterprises automating their first workflow, we partner with our clients end-to-end — from architecture to deployment, training, and ongoing support.</p>
+        <div class="about-points">
+          <div class="about-point">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <div><strong>Practical, not flashy.</strong><br/><span style="color:var(--text-2)">Tools your team will use on day one.</span></div>
+          </div>
+          <div class="about-point">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <div><strong>Scalable from the start.</strong><br/><span style="color:var(--text-2)">Architecture that grows with you — no rewrites at year two.</span></div>
+          </div>
+          <div class="about-point">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <div><strong>End-to-end ownership.</strong><br/><span style="color:var(--text-2)">Design, build, deploy, monitor, maintain. One partner.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="about-card reveal reveal-delay-1">
+        <div class="mini"><strong>2024</strong><span>Founded</span></div>
+        <div class="mini"><strong>15+</strong><span>Specialists</span></div>
+        <div class="mini"><strong>3</strong><span>Service lines</span></div>
+        <div class="mini"><strong>RD</strong><span>Headquartered in the Dominican Republic</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">What we do</span>
+      <h2>Four service lines, one team.</h2>
+      <p class="lead" style="margin:14px auto 0">Pick the engagement that fits — or combine them. Most clients start with one project and stay for the platform.</p>
+    </div>
+    <div class="cards">
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+        <h3>Transportation Solutions</h3>
+        <p>Fleet, driver, route and shipment management. Custom TMS platforms tailored to logistics, freight, and passenger operations.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l7 7"/></svg></div>
+        <h3>Automation & AI</h3>
+        <p>Workflow automation, document intelligence, chat agents, and AI-assisted operations. We integrate language models where they pay off.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <h3>Remote Support</h3>
+        <p>24/7 monitoring, patching, incident response, and end-user support. We watch your systems so your team can sleep.</p>
+      </div>
+      <div class="card reveal reveal-delay-3">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <h3>Technology Consulting</h3>
+        <p>Stack reviews, cloud migrations, security audits, and roadmaps. Independent advice from people who also ship.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSPORTATION FEATURE -->
+<section id="transport">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Flagship product</span>
+      <h2>The Nexura Transportation Platform.</h2>
+    </div>
+    <div class="feature reveal">
+      <div>
+        <h3 style="font-size:1.5rem">Run your fleet from one screen.</h3>
+        <p style="margin-top:10px">Designed for operators who outgrew spreadsheets but don't need an enterprise suite. Built on a modern, open stack you can extend — and we host it on your domain.</p>
+        <ul class="feature-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div><strong>Vehicles & drivers</strong> — assignments, documents, expirations, status.</div></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div><strong>Shipments & routes</strong> — pickup-to-delivery lifecycle with status events.</div></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div><strong>Roles & auth</strong> — admins, dispatchers, drivers; JWT-secured API.</div></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><div><strong>Self-hosted</strong> — your data, your server, your domain. SSL by default.</div></li>
+        </ul>
+        <div style="margin-top:26px"><a href="#contact" class="btn btn-primary">Request a demo</a></div>
+      </div>
+      <div class="feature-visual" aria-hidden="true">
+        <svg class="map-svg" viewBox="0 0 400 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ln" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#00e0c6"/>
+              <stop offset="100%" stop-color="#4f7cff"/>
+            </linearGradient>
+          </defs>
+          <!-- map shape -->
+          <path d="M30 60 C70 30, 150 30, 200 60 S320 100, 370 70 L370 300 C320 320, 200 290, 150 310 S60 290, 30 300 Z" fill="rgba(255,255,255,0.025)" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+          <!-- roads -->
+          <path d="M60 240 Q140 180 200 200 T340 130" stroke="url(#ln)" stroke-width="2" stroke-dasharray="5 5" fill="none">
+            <animate attributeName="stroke-dashoffset" from="0" to="20" dur="1.2s" repeatCount="indefinite"/>
+          </path>
+          <path d="M80 100 Q160 120 220 100 T360 200" stroke="url(#ln)" stroke-width="2" stroke-dasharray="5 5" fill="none" opacity=".7">
+            <animate attributeName="stroke-dashoffset" from="0" to="20" dur="1.6s" repeatCount="indefinite"/>
+          </path>
+          <!-- pins -->
+          <g>
+            <circle cx="60" cy="240" r="6" fill="#00e0c6"><animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="340" cy="130" r="6" fill="#4f7cff"><animate attributeName="r" values="6;9;6" dur="2.2s" repeatCount="indefinite"/></circle>
+            <circle cx="80" cy="100" r="5" fill="#8b5cf6"/>
+            <circle cx="360" cy="200" r="5" fill="#8b5cf6"/>
+            <circle cx="200" cy="200" r="4" fill="#f3f6fb" opacity=".5"/>
+          </g>
+          <!-- truck -->
+          <g transform="translate(180 188)">
+            <rect width="38" height="20" rx="3" fill="#0a0f1e" stroke="#00e0c6" stroke-width="1.5"/>
+            <rect x="28" y="6" width="14" height="14" rx="2" fill="#0a0f1e" stroke="#00e0c6" stroke-width="1.5"/>
+            <circle cx="10" cy="22" r="3" fill="#00e0c6"/>
+            <circle cx="34" cy="22" r="3" fill="#00e0c6"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI / AUTOMATION FEATURE -->
+<section id="ai" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Automation & AI</span>
+      <h2>Quietly automate the boring work.</h2>
+      <p class="lead" style="margin:14px auto 0">We integrate AI where it earns its keep: document processing, customer support triage, internal copilots, and operational reporting.</p>
+    </div>
+    <div class="cards">
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <h3>Document Intelligence</h3>
+        <p>Extract structured data from invoices, bills of lading, manifests, and contracts. Send to the system of record automatically.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>Customer Chat Agents</h3>
+        <p>Multilingual chat agents over WhatsApp, your site, or internal Slack — grounded in your own knowledge base.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <h3>Workflow Automation</h3>
+        <p>Connect the systems you already pay for. Eliminate the copy-paste between email, ERP, and spreadsheets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REMOTE SUPPORT -->
+<section id="support">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Remote Support</span>
+      <h2>We're already watching your servers.</h2>
+      <p class="lead" style="margin:14px auto 0">Managed support plans for the businesses that can't afford a full-time ops team — and shouldn't need one.</p>
+    </div>
+    <div class="cards">
+      <div class="card reveal">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3>24/7 Monitoring</h3>
+        <p>Uptime, latency, error rates, disk and certificate watchers — alerts before users notice.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Patching & Security</h3>
+        <p>OS hardening, regular updates, vulnerability scans, and SSL renewals on schedule.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <h3>Help-Desk Access</h3>
+        <p>Your team gets a real human via WhatsApp or email — typically replying in under an hour.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA STRIP -->
+<section style="background:var(--bg-2);padding-top:0">
+  <div class="cta-strip reveal">
+    <div>
+      <h2>Let's build the next version of your operation.</h2>
+      <p>30-minute discovery call, no commitment. We'll tell you what's worth doing — and what isn't.</p>
+    </div>
+    <a href="#contact" class="btn">Book a call</a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Get in touch</span>
+      <h2>Talk to a human.</h2>
+      <p class="lead" style="margin:14px auto 0">Tell us about your project. We'll get back within one business day.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="reveal">
+        <h3 style="font-size:1.2rem">Reach Nexura RD</h3>
+        <div class="contact-list">
+          <a class="contact-item" href="https://wa.me/18095550100?text=Hello%20Nexura%20RD%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener">
+            <span class="icn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.94 11.94 0 0 0 12.05.05C5.5.05.18 5.37.18 11.92a11.86 11.86 0 0 0 1.7 6.12L0 24l6.13-1.6a11.85 11.85 0 0 0 5.92 1.51h.01c6.55 0 11.87-5.32 11.87-11.87a11.84 11.84 0 0 0-3.41-8.56zM12.06 21.9a9.86 9.86 0 0 1-5.03-1.38l-.36-.21-3.64.95.97-3.55-.23-.36a9.83 9.83 0 0 1-1.52-5.27c0-5.46 4.44-9.9 9.9-9.9a9.83 9.83 0 0 1 7 2.9 9.81 9.81 0 0 1 2.9 7c0 5.46-4.44 9.9-9.9 9.9zm5.41-7.41c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.76-1.67-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.11 3.22 5.12 4.51.72.31 1.27.5 1.7.64.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg></span>
+            <div><small>WhatsApp</small><br/><span>+1 (809) 555-0100</span></div>
+          </a>
+          <a class="contact-item" href="mailto:hello@nexorard.org">
+            <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+            <div><small>Email</small><br/><span>hello@nexorard.org</span></div>
+          </a>
+          <a class="contact-item" href="tel:+18095550100">
+            <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg></span>
+            <div><small>Phone</small><br/><span>+1 (809) 555-0100</span></div>
+          </a>
+          <div class="contact-item">
+            <span class="icn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            <div><small>Headquarters</small><br/><span>Santo Domingo, Dominican Republic</span></div>
+          </div>
+        </div>
+      </div>
+      <form class="reveal reveal-delay-1" id="contactForm" onsubmit="return handleSubmit(event)">
+        <div>
+          <label for="name">Your name</label>
+          <input id="name" name="name" required placeholder="Jane Doe" />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="jane@company.com" />
+        </div>
+        <div>
+          <label for="company">Company (optional)</label>
+          <input id="company" name="company" placeholder="Acme Logistics" />
+        </div>
+        <div>
+          <label for="message">How can we help?</label>
+          <textarea id="message" name="message" rows="4" required placeholder="A short description of your project, problem, or idea."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="justify-self:start;margin-top:6px">
+          Send message
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+        <p id="formStatus" style="color:var(--brand-0);font-size:.9rem;display:none">Thanks — we've recorded your message. We'll reach out via email shortly.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="brand" style="margin-bottom:14px"><span class="brand-mark">N</span><span>Nexura<span style="color:var(--brand-0)">RD</span></span></div>
+      <p style="font-size:.92rem">Digital infrastructure for transportation, automation, and small-to-medium enterprises. Built in the Dominican Republic, deployed worldwide.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <a href="#transport">Transportation</a>
+      <a href="#ai">Automation & AI</a>
+      <a href="#support">Remote support</a>
+      <a href="#services">Consulting</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact">Careers</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="mailto:hello@nexorard.org">hello@nexorard.org</a>
+      <a href="https://wa.me/18095550100" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="https://nexorard.org">nexorard.org</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year"></span> Nexura RD. All rights reserved.</span>
+    <span>Built with care · Hosted on our own infrastructure</span>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
+<a class="wa-fab" href="https://wa.me/18095550100?text=Hello%20Nexura%20RD%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.48A11.94 11.94 0 0 0 12.05.05C5.5.05.18 5.37.18 11.92a11.86 11.86 0 0 0 1.7 6.12L0 24l6.13-1.6a11.85 11.85 0 0 0 5.92 1.51h.01c6.55 0 11.87-5.32 11.87-11.87a11.84 11.84 0 0 0-3.41-8.56zM12.06 21.9a9.86 9.86 0 0 1-5.03-1.38l-.36-.21-3.64.95.97-3.55-.23-.36a9.83 9.83 0 0 1-1.52-5.27c0-5.46 4.44-9.9 9.9-9.9a9.83 9.83 0 0 1 7 2.9 9.81 9.81 0 0 1 2.9 7c0 5.46-4.44 9.9-9.9 9.9zm5.41-7.41c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.76-1.67-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.11 3.22 5.12 4.51.72.31 1.27.5 1.7.64.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg>
+</a>
+
+<script>
+  // Footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+  }, {passive:true});
+
+  // Mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('is-visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Card hover glow tracking
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    });
+  });
+
+  // Contact form (front-end only — wire to a backend endpoint or service like Formspree before going live)
+  function handleSubmit(ev){
+    ev.preventDefault();
+    const data = Object.fromEntries(new FormData(ev.target));
+    console.log('contact submission', data);
+    document.getElementById('formStatus').style.display = 'block';
+    ev.target.reset();
+    return false;
+  }
+</script>
+
+</body>
+</html>
